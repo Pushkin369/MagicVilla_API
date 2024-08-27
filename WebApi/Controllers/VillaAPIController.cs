@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Data;
+using WebApi.Logging;
 using WebApi.Models;
 using WebApi.Models.Dto;
 
@@ -11,9 +12,8 @@ namespace WebApi.Controllers
 
     public class VillaAPIController : ControllerBase
     {
-        private readonly ILogger<VillaAPIController> _logger;
-
-        public VillaAPIController(ILogger<VillaAPIController> logger)
+        private readonly ILogging _logger;
+        public VillaAPIController(ILogging logger)
         {
             _logger = logger;
         }
@@ -22,7 +22,7 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
-            _logger.LogInformation("GetAllVillas");
+            _logger.Log("GetAllVillas","");
             return Ok(VillaStore.villaList);
         }
 
@@ -34,7 +34,10 @@ namespace WebApi.Controllers
         public ActionResult<VillaDTO> GetVilla(int id)
         {
             if (id == 0)
+            {
+                _logger.Log($"GetVillasWIthID = {id}", "error");
                 return BadRequest();
+            }
             var viila = VillaStore.villaList.FirstOrDefault(u => u.Id == id);
             if (viila == null)
                 return NotFound();
